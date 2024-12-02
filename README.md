@@ -99,7 +99,7 @@ stack backtrace:
   12: core::ops::function::FnOnce::call_once
              at /rustc/eeb90cda1969383f56a2637cbd3037bdf598841c/library/core/src/ops/function.rs:250:5
 ```
-It appears to not like a call to `invoke_v` inside the body of `__wbindgen_describe_rs_add`.
+It appears to not like a call to `invoke_v` inside the body of `__wbindgen_describe_rs_add`. This function is also ~5x smaller when targeting `wasm32-unknown-unknown` instead of `wasm32-unknown-emscripten`. I'm not sure if that's the fault of wasm-bindgen or rustc, but I suspect the former.
 
 ## What's next?
 Get wasm-bindgen to execute on that `/tmp/emscripten_temp/emcc-00-base.wasm` file.
