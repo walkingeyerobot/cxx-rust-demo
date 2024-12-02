@@ -41,10 +41,34 @@ Because we built with `EMCC_DEBUG=1 EMCC_DEBUG_SAVE=1`, we can actually look at 
 
 ### Attempt to run wasm-bindgen
 ```
-RUST_BACKTRACE=1 target/debug/wasm-bindgen --target web --keep-lld-exports --out-dir ~/tmp /tmp/emscripten_temp/emcc-00-base.wasm
+RUST_LOG=debug RUST_BACKTRACE=1 target/debug/wasm-bindgen --target web --keep-lld-exports --out-dir ~/tmp /tmp/emscripten_temp/emcc-00-base.wasm
 ```
 It doesn't work :(
 ```
+[2024-12-02T21:20:55Z DEBUG walrus::module::types] parsing type section
+[2024-12-02T21:20:55Z DEBUG walrus::module::imports] parse import section
+[2024-12-02T21:20:55Z DEBUG walrus::module::functions] parse function section
+[2024-12-02T21:20:55Z DEBUG walrus::module::tables] parse table section
+[2024-12-02T21:20:55Z DEBUG walrus::module::memories] parse memory section
+[2024-12-02T21:20:55Z DEBUG walrus::module::globals] parse global section
+[2024-12-02T21:20:55Z DEBUG walrus::module::exports] parse export section
+[2024-12-02T21:20:55Z DEBUG walrus::module::elements] parse element section
+[2024-12-02T21:20:55Z DEBUG walrus::module::data] parse data section
+[2024-12-02T21:20:55Z DEBUG walrus::module] parsing custom section `__wasm_bindgen_unstable`
+[2024-12-02T21:20:55Z DEBUG walrus::module] parse name section
+[2024-12-02T21:20:55Z WARN  walrus::module] in name section: index `0` is out of bounds for data
+[2024-12-02T21:20:55Z WARN  walrus::module] in name section: index `1` is out of bounds for data
+[2024-12-02T21:20:55Z DEBUG walrus::module::producers] parse producers section
+[2024-12-02T21:20:55Z DEBUG walrus::module] parsing custom section `target_features`
+[2024-12-02T21:20:55Z DEBUG walrus::module::functions] parse code section
+[2024-12-02T21:20:55Z DEBUG walrus::module] parse complete
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_cli_support::wit] custom section '__wasm_bindgen_unstable' looks like a Wasm bindgen section
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_cli_support::wit] found version specifier {"schema_version":"0.2.95","version":"0.2.95 (4b8327082)"}
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_cli_support::wit] found a program of length 61
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_wasm_interpreter] starting a call of Id { idx: 131 } Some("__wbindgen_describe_rs_add")
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_wasm_interpreter] arguments []
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_wasm_interpreter] starting a call of Id { idx: 22 } Some("invoke_v")
+[2024-12-02T21:20:55Z DEBUG wasm_bindgen_wasm_interpreter] arguments [32752]
 thread 'main' panicked at crates/wasm-interpreter/src/lib.rs:224:18:
 can only call locally defined functions
 stack backtrace:
@@ -75,7 +99,7 @@ stack backtrace:
   12: core::ops::function::FnOnce::call_once
              at /rustc/eeb90cda1969383f56a2637cbd3037bdf598841c/library/core/src/ops/function.rs:250:5
 ```
-It appears to not like a call to `invoke_v`. There is such a call  inside the body of `__wbindgen_describe_rs_add`, but I haven't tracked down this error exactly yet.
+It appears to not like a call to `invoke_v` inside the body of `__wbindgen_describe_rs_add`.
 
 ## What's next?
 Get wasm-bindgen to execute on that `/tmp/emscripten_temp/emcc-00-base.wasm` file.
