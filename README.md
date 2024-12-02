@@ -21,6 +21,7 @@ cargo build --target=wasm32-unknown-emscripten
 ### Build the C++ code and link in the Rust.
 ```
 EMCC_DEBUG=1 EMCC_DEBUG_SAVE=1 em++ embind.cc random_point_generator.cc -lembind target/wasm32-unknown-emscripten/debug/libcxxrustdemo.a --pre-js=pre.js
+EMCC_DEBUG=1 EMCC_DEBUG_SAVE=1 em++ embind.cc random_point_generator.cc -lembind target/wasm32-unknown-emscripten/debug/libcxxrustdemo.a --pre-js=pre.js -sEXPORTED_FUNCTIONS=_rs_add,___wbindgen_describe_rs_add
 ```
 ### Run it
 ```
