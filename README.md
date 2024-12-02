@@ -14,21 +14,68 @@ To do this, my goal is to make wasm-bindgen output JS that can be consumed by Em
 ## How do I build this?
 ### Install cargo and rust and emscripten and stuff.
 idk I forgot what I installed.
+
+### Set up wasm-bindgen
+Get it from https://github.com/walkingeyerobot/wasm-bindgen. Needs patches to work with wasm32-unknown-emscripten and will undoubtedly have more patches as this gets closer to working.
+
 ### Build the Rust code.
 ```
 cargo build --target=wasm32-unknown-emscripten
 ```
 ### Build the C++ code and link in the Rust.
 ```
-EMCC_DEBUG=1 EMCC_DEBUG_SAVE=1 em++ embind.cc random_point_generator.cc -lembind target/wasm32-unknown-emscripten/debug/libcxxrustdemo.a --pre-js=pre.js
 EMCC_DEBUG=1 EMCC_DEBUG_SAVE=1 em++ embind.cc random_point_generator.cc -lembind target/wasm32-unknown-emscripten/debug/libcxxrustdemo.a --pre-js=pre.js -sEXPORTED_FUNCTIONS=_rs_add,___wbindgen_describe_rs_add
 ```
-### Run it
+### Observe the errors
+Emscripten does not finish linking due to not knowing about a rust symbol. Full error:
 ```
-node a.out.js
+error: undefined symbol: __wbindgen_describe (referenced by root reference (e.g. compiled C/C++ code))
+warning: To disable errors for undefined symbols use `-sERROR_ON_UNDEFINED_SYMBOLS=0`
+warning: ___wbindgen_describe may need to be added to EXPORTED_FUNCTIONS if it arrives from a system library
+Error: Aborting compilation due to previous errors
 ```
 
-## What's the issue?
-I haven't yet figured out how to produce a .wasm file that has annotations that can be consumed by wasm-bindgen that indicate that the function `rs_add` should be exported.
+This is fine, and even expected. Once this is finished, we'll have Emscripten invoke wasm-bindgen before it gets to this phase, and I *think* `__wbindgen_describe` will end up coming from wasm-bindgen js (though I really should confirm this).
 
-Once I have produced this .wasm file, I'll be able to iterate on wasm-bindgen code to produce .js that can be consumed by Emscripten.
+Because we built with `EMCC_DEBUG=1 EMCC_DEBUG_SAVE=1`, we can actually look at a .wasm file. Running wabt's wasm2wat on `/tmp/emscripten_temp/emcc-00-base.wasm` lets us confirm that our `rs_add` symbols are indeed in there.
+
+### Attempt to run wasm-bindgen
+```
+RUST_BACKTRACE=1 target/debug/wasm-bindgen --target web --keep-lld-exports --out-dir ~/tmp /tmp/emscripten_temp/emcc-00-base.wasm
+```
+It doesn't work :(
+```
+thread 'main' panicked at crates/wasm-interpreter/src/lib.rs:224:18:
+can only call locally defined functions
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/eeb90cda1969383f56a2637cbd3037bdf598841c/library/std/src/panicking.rs:665:5
+   1: core::panicking::panic_fmt
+             at /rustc/eeb90cda1969383f56a2637cbd3037bdf598841c/library/core/src/panicking.rs:74:14
+   2: wasm_bindgen_wasm_interpreter::Interpreter::call
+             at ./crates/wasm-interpreter/src/lib.rs:224:18
+   3: wasm_bindgen_wasm_interpreter::Frame::eval
+             at ./crates/wasm-interpreter/src/lib.rs:389:21
+   4: wasm_bindgen_wasm_interpreter::Interpreter::call
+             at ./crates/wasm-interpreter/src/lib.rs:243:31
+   5: wasm_bindgen_wasm_interpreter::Interpreter::interpret_descriptor
+             at ./crates/wasm-interpreter/src/lib.rs:136:9
+   6: wasm_bindgen_cli_support::descriptors::WasmBindgenDescriptorsSection::execute_exports
+             at ./crates/cli-support/src/descriptors.rs:59:30
+   7: wasm_bindgen_cli_support::descriptors::execute
+             at ./crates/cli-support/src/descriptors.rs:37:5
+   8: wasm_bindgen_cli_support::Bindgen::generate_output
+             at ./crates/cli-support/src/lib.rs:387:9
+   9: wasm_bindgen_cli_support::Bindgen::generate
+             at ./crates/cli-support/src/lib.rs:302:9
+  10: wasm_bindgen::rmain
+             at ./crates/cli/src/bin/wasm-bindgen.rs:155:5
+  11: wasm_bindgen::main
+             at ./crates/cli/src/bin/wasm-bindgen.rs:88:21
+  12: core::ops::function::FnOnce::call_once
+             at /rustc/eeb90cda1969383f56a2637cbd3037bdf598841c/library/core/src/ops/function.rs:250:5
+```
+It appears to not like a call to `invoke_v`. There is such a call  inside the body of `__wbindgen_describe_rs_add`, but I haven't tracked down this error exactly yet.
+
+## What's next?
+Get wasm-bindgen to execute on that `/tmp/emscripten_temp/emcc-00-base.wasm` file.
