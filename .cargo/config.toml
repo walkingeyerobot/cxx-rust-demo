@@ -1,2 +1,6 @@
 [build]
-rustflags = ["-C", "link-args=--no-entry"]
+rustflags = [
+    "-Clink-args=--no-entry",
+    "-Cllvm-args=-enable-emscripten-cxx-exceptions=0",
+]
+
