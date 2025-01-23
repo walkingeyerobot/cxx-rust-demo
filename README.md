@@ -21,7 +21,7 @@ I could probably do some more setup instructions here.
 
 ### Build the Rust code.
 ```
-cargo build -v --target=wasm32-unknown-emscripten
+cargo build -v
 ```
 ### Build the C++ code and link in the Rust.
 ```
