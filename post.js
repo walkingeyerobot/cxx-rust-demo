@@ -1,5 +1,5 @@
 (function() {
-  var oldCallback = Module.onRuntimeInitialized;
+  var oldCallback = Module.onRuntimeInitialized || (function(){});
   Module.onRuntimeInitialized = function() {
     oldCallback();
     console.log('testing js -> c++, random point:');
