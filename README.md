@@ -43,8 +43,7 @@ testing js -> rust: random point:
 ## What's next?
 
 ### For Emscripten
-1. Figure out how to merge the `pre.js` code into `library_wbg.js`. This should be pretty straightforward.
-2. There's an issue with running stripping on the wasm-bindgen produced .wasm. `llvm-objcopy` errors out with `invalid function export`. I just commented out that part in Emscripten for now, but it needs to be fixed.
+1. There's an issue with running stripping on the wasm-bindgen produced .wasm. `llvm-objcopy` errors out with `invalid function export`. I just commented out that part in Emscripten for now, but it needs to be fixed.
 
 ### For wasm-bindgen
 1. Start writing tests. Every test that wasm-bindgen currently has should have an `--output=emscripten` equivalent.
