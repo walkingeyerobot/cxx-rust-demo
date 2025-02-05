@@ -1,55 +1,44 @@
-use rand::Rng;
 use wasm_bindgen::prelude::*;
 
-#[no_mangle]
-pub extern "C" fn random_rs(lower: f64, upper: f64) -> f64 {
-    let mut rng = rand::thread_rng();
-    return rng.gen_range(lower..upper);
+#[wasm_bindgen]
+extern "C" {
+    fn setInterval(closure: &Closure<dyn FnMut()>, millis: u32) -> f64;
+    fn clearInterval(token: f64);
+
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
 }
 
 #[wasm_bindgen]
-pub fn rs_add(a: i32, b: i32) -> i32 {
-    return a + b;
+pub struct Interval {
+    closure: Closure<dyn FnMut()>,
+    token: f64,
 }
 
-#[wasm_bindgen]
-#[repr(C)]
-struct RsPoint {
-    x: f64,
-    y: f64,
-}
+impl Interval {
+    pub fn new<F: 'static>(millis: u32, f: F) -> Interval
+    where
+        F: FnMut()
+    {
+        // Construct a new closure.
+        let closure = Closure::new(f);
 
-#[wasm_bindgen]
-impl RsPoint {
-    pub fn get_x(&self) -> f64 {
-        self.x
+        // Pass the closure to JS, to run every n milliseconds.
+        let token = setInterval(&closure, millis);
+
+        Interval { closure, token }
     }
-    pub fn get_y(&self) -> f64 {
-        self.y
+}
+
+// When the Interval is destroyed, clear its `setInterval` timer.
+impl Drop for Interval {
+    fn drop(&mut self) {
+        clearInterval(self.token);
     }
 }
 
+// Keep logging "hello" every second until the resulting `Interval` is dropped.
 #[wasm_bindgen]
-#[repr(C)]
-struct RandomPointGeneratorRs {
-    left: f64,
-    top: f64,
-    right: f64,
-    bottom: f64,
-}
-
-#[wasm_bindgen]
-impl RandomPointGeneratorRs {
-    pub fn new(left: f64, top: f64, right: f64, bottom: f64) -> Self {
-        Self { left, top, right, bottom }
-    }
-
-    pub fn get_random_point(&self) -> RsPoint {
-        RsPoint {
-            //x: unsafe { random_cc(self.left, self.right) },
-            //y: unsafe { random_cc(self.top, self.bottom) },
-            x: random_rs(self.left, self.right),
-            y: random_rs(self.top, self.bottom),
-        }
-    }
+pub fn hello() -> Interval {
+    Interval::new(1_000, || log("hello"))
 }
