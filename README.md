@@ -18,15 +18,13 @@ thread 'main' panicked at crates/wasm-interpreter/src/lib.rs:196:18:
 failed to find entry in function table: failed to find `32753` in function table
 ```
 
-We attempted to address this in the wasm interpreter, but that appears to trigger another failure mode and it also breaks the wasm32-unknown-unknown use case.
+We attempted to address this in the wasm interpreter, but we'd prefer to understand the codegen differences between `wasm32-unknown-unknown` and `wasm32-unknown-emscripten`.
 
 ## How do I build this?
 ### Install cargo and rust and emscripten and stuff.
 You'll need Emscripten from [https://github.com/walkingeyerobot/emscripten](https://github.com/walkingeyerobot/emscripten/tree/wbg-walkingeyerobot). Note the branch is called `wbg-walkingeyerobot`. Update PATH variable so that it points to this emscripten repo.
 
-You'll need wasm-bindgen from https://github.com/walkingeyerobot/wasm-bindgen
-
-I could probably do some more setup instructions here.
+You'll need wasm-bindgen from [https://github.com/walkingeyerobot/wasm-bindgen](https://github.com/walkingeyerobot/wasm-bindgen/tree/test2). Note the branch is called `test2`.
 
 ## Reproduction steps.
 Build the wasm-bindgen binary in the directory where wasm-bindgen is cloned. 
