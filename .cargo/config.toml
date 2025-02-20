@@ -6,5 +6,7 @@ rustflags = [
      "-C",
     "panic=abort",
     "-Clink-args=-sDISABLE_EXCEPTION_CATCHING=1",
+    "-C",
+    "relocation-model=static",
 ]
 
