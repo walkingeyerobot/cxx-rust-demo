@@ -5,5 +5,7 @@ rustflags = [
     "-Cllvm-args=-enable-emscripten-cxx-exceptions=0",
     "-C",
     "panic=abort",
+    "-C",
+    "relocation-model=static",
 ]
 
