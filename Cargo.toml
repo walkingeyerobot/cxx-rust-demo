@@ -6,11 +6,22 @@ edition = "2021"
 [lib]
 crate-type = ["staticlib"]
 # change to cdylib if you want to produce just a .wasm file from the rust.
-# crate-type = ["cdylib"]
+#crate-type = ["cdylib"]
 
 [dependencies]
 rand = "0.8.5"
 wasm-bindgen = { path = "../wasm-bindgen" }
+
+wasm-bindgen-futures = { path = '../wasm-bindgen/crates/futures' }
+js-sys = { path = "../wasm-bindgen/crates/js-sys", version = '=0.3.77', default-features = false }
+web-sys = { path = "../wasm-bindgen/crates/web-sys", features = ["Window", "CryptoKey", "CryptoKeyPair", "SubtleCrypto", "Crypto", "HkdfParams", "HmacImportParams", "AesGcmParams", "EcKeyImportParams", "EcKeyGenParams", "EcdsaParams", "EcdhKeyDeriveParams"] }
+
+mls-rs = { path = "../mls-rs/mls-rs"}
+mls-rs-crypto-webcrypto = {path = "../mls-rs/mls-rs-crypto-webcrypto", version = '0.8'}
+mls-rs-core = { path = "../mls-rs/mls-rs-core", default-features = false, version = "0.21.0" }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+
 # wasm-bindgen = "0.2.99"
 # necessary if you want to target wasm32-unknown-unknown
-# getrandom = { version = "0.2", features = ["js"] }
+#getrandom = { version = "0.2", features = ["js"] }
