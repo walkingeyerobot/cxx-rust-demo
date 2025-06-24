@@ -9,7 +9,7 @@ crate-type = ["staticlib"]
 # crate-type = ["cdylib"]
 
 [dependencies]
-rand = "0.8.5"
+rand = "0.9.1"
 wasm-bindgen = { path = "../wasm-bindgen" }
 # wasm-bindgen = "0.2.99"
 # necessary if you want to target wasm32-unknown-unknown
