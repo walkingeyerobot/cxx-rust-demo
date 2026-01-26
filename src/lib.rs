@@ -3,6 +3,13 @@ use wasm_bindgen::prelude::*;
 use rand::distr::Uniform;
 use rand::Rng;
 
+#[no_mangle]
+#[wasm_bindgen]
+pub extern "C" fn random_rs(lower: f64, upper: f64) -> f64 {
+    let mut rng = rand::rng();
+    return rng.random_range(lower..upper);
+}
+
 #[wasm_bindgen]
 pub struct Point {
     x: f64,
@@ -28,17 +35,17 @@ impl Point {
 }
 
 #[wasm_bindgen]
-pub struct RandomPointGenerator {
+pub struct RandomPointGeneratorRs {
     generator: rand::prelude::ThreadRng,
     distribution_x: Uniform<f64>,
     distribution_y: Uniform<f64>,
 }
 
 #[wasm_bindgen]
-impl RandomPointGenerator {
+impl RandomPointGeneratorRs {
     #[wasm_bindgen(constructor)]
-    pub fn new(left: f64, top: f64, right: f64, bottom: f64) -> RandomPointGenerator {
-        RandomPointGenerator {
+    pub fn new(left: f64, top: f64, right: f64, bottom: f64) -> RandomPointGeneratorRs {
+        RandomPointGeneratorRs {
             generator: rand::rng(),
             distribution_x: Uniform::new(left, right).unwrap(),
             distribution_y: Uniform::new(top, bottom).unwrap(),

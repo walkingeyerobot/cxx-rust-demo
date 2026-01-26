@@ -1,3 +1,4 @@
 a.out.*
 embind.d.ts
 target/
+Cargo.lock
